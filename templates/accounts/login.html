@@ -1,0 +1,9 @@
+{% extends "accounts/base.html" %}
+
+{% block body %}
+   <a class="zocial vk" href="{% url socialauth_begin 'vkontakte-oauth2' %}">Вход</a>
+ <a class="zocial googleplus" href="/social/login/google-oauth2/">Google+</a><br>
+ <a href="#" class="zocial facebook">Facebook</a>
+ <a href="#" class="zocial twitter">Twitter</a>
+  
+{% endblock %}  

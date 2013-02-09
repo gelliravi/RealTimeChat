@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>chat</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  		<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/maxmertkit.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/maxmertkit-components.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/maxmertkit-animation.css">
+		<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+		<script type="text/javascript" src="/static/js/libs/html5shiv.js"></script>
+		<script type="text/javascript" src="/static/js/libs/jquery.js"></script>
+		<script type="text/javascript" src="/static/js/plugins/maxmertkit.js"></script>
+		<script type="text/javascript" src="/static/js/plugins/maxmertkit.affix.js"></script>
+		<script type="text/javascript" src="/static/js/plugins/maxmertkit.popup.js"></script>
+		<script type="text/javascript" src="/static/js/plugins/maxmertkit.button.js"></script>
+		<script type="text/javascript" src="/static/js/plugins/maxmertkit.notify.js"></script>
+        <link rel="stylesheet" type="text/css" href="/static/css/zocial.css" />
+        <link href='http://fonts.googleapis.com/css?family=Pompiere' rel='stylesheet' type='text/css'>
+    <script src="http://localhost:4000/socket.io/socket.io.js"></script>
+  <style>
+    
+* {font-size:16px; font-family:sans-serif;}
+h1 a {font-size:24px;}
+body {margin:20px 0 0 0;}
+#main {padding-bottom:100px;}
+
+input {border:1px solid #999; padding:10px; border-radius:5px;position:fixed; bottom:4px;width: 60%}
+#send {padding:10px; border-radius:5px;position:fixed; bottom:4px;alignment-adjust: middle}
+#message, #name {width:600px; margin:20px 0 20px 20px;}
+#submit, #leave {cursor:pointer; margin-left:10px; padding:10px 30px;}
+
+ul {margin:0; padding:0; list-style-type:none;}
+h1, p, li {margin:10px 20px;}
+
+#users {position:fixed; right:0; top:0; bottom:0; width:210px;
+        background:#eee; overflow:hidden;
+        border-left:1px solid #ccc;}
+
+.room {float:left;}
+form label {margin-left:10px;}
+.system {font-weight:bold; color:#f00;}
+
+  </style>
+  <script>
+    $(document).ready(function(){
+      var socket = io.connect('localhost', {port: 4000});
+      var date = new Date().getHours() + ":" + new Date().getMinutes()
+      socket.on('connect', function(){
+        $('#messages').append('<li> '+date+' {{ request.user.first_name }} присоединился</li>');
+      });
+      socket.on('is_type', function(){
+        $('#messages').append('<li> '+date+' {{ request.user.first_name }} хочет что-то сказать</li>');
+      });
+      var entry_el = $('#comment');
+               
+      socket.on('message', function(message) {
+        
+        var data = message.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+        
+        
+        $('#messages').append('<li> '+date+' ' + data + '</li>');
+        window.scrollBy(0, 10000000000);
+        entry_el.focus();
+      });
+      
+      /*entry_el.keyup(function(event){
+        socket.emit('is_type', '', function(data){
+              
+        });
+      })*/
+     
+                     
+      entry_el.keypress(function(event){
+        
+        if(event.keyCode != 13) return;
+        var msg = entry_el.attr('value');
+        
+        if(msg){
+           socket.emit('send_message', msg, function(data){
+              
+           });
+        
+        
+        entry_el.attr('value', '');
+       }
+      });
+    });
+  </script>
+</head>
+<body>
+    <ul id="messages">
+        {% for comment in comments %}
+            <li>{{ comment.user.first_name }} {{ comment.user.last_name }}: {{comment.text}}</li>
+        {% endfor %}
+    </ul>
+    <ul id="users">
+   <li id="">test</li>
+   <li id="">test</li>
+   <li id="">test</li>
+</ul>
+    <input type="text" id="comment" name="comment" />
+  
+</body>
+</html>
